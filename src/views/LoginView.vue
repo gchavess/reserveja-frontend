@@ -6,7 +6,7 @@
         <input-email @value="user.email = $event" />
         <input-password @value="user.senha = $event"></input-password>
 
-        <button-label :label="'Entrar'"></button-label>
+        <button-label :label="'Entrar'" :disabled="!formValid"></button-label>
 
         <div class="container-botoes">
           <a href="#">Esqueceu sua senha?</a>
@@ -24,6 +24,7 @@ import { Component, Vue } from "vue-facing-decorator";
 import InputEmail from "@/components/InputEmail/InputEmail.vue";
 import InputPassword from "@/components/InputPassword/InputPassword.vue";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
+import { validateForm } from "@/utils/FormUtils.js";
 
 @Component({
   components: { InputEmail, InputPassword, ButtonLabel },
@@ -33,6 +34,19 @@ export default class LoginView extends Vue {
     email: "",
     senha: "",
   };
+
+  validationRules = {
+    email: [{ required: true, message: "Por favor, insira seu e-mail." }],
+    senha: [{ required: true, message: "Por favor, insira sua senha." }],
+  };
+
+  get errors() {
+    return validateForm(this.user, this.validationRules);
+  }
+
+  get formValid() {
+    return this.errors.errorCount === 0;
+  }
 }
 </script>
 

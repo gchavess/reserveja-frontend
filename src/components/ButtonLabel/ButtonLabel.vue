@@ -1,5 +1,5 @@
 <template>
-  <button class="btn">{{ label }}</button>
+  <button class="btn" :disabled="disabled">{{ label }}</button>
 </template>
 
 <script>
@@ -12,6 +12,9 @@ import { Component, Vue, Prop } from "vue-facing-decorator";
 export default class Button extends Vue {
   @Prop()
   label = "Entrar";
+
+  @Prop()
+  disabled = false;
 }
 </script>
 
@@ -31,5 +34,10 @@ export default class Button extends Vue {
 
 .btn:hover {
   background-color: #d68850;
+}
+
+.btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>
