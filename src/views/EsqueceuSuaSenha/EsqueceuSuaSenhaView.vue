@@ -2,19 +2,15 @@
   <div class="container">
     <div class="container-login">
       <div class="content">
-        <span class="title">Seja bem-vindo ao ReserveJá!</span>
+        <span class="title">Redefinir sua senha</span>
         <input-email @value="user.email = $event" />
-        <input-password @value="user.senha = $event"></input-password>
 
-        <button-label :label="'Entrar'" :disabled="!formValid"></button-label>
+        <button-label
+          :label="'Redefinir'"
+          :disabled="!formValid"
+        ></button-label>
 
-        <div class="container-botoes">
-          <a href="#">Esqueceu sua senha?</a>
-          <span class="texto-cadastro"
-            >Não tem uma conta?
-            <a href="/cadastro">Increver-se no ReserveJá</a></span
-          >
-        </div>
+        <div class="container-botoes"></div>
       </div>
     </div>
   </div>
@@ -23,22 +19,19 @@
 <script>
 import { Component, Vue } from "vue-facing-decorator";
 import InputEmail from "@/components/InputEmail/InputEmail.vue";
-import InputPassword from "@/components/InputPassword/InputPassword.vue";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import { validateForm } from "@/utils/FormUtils.js";
 
 @Component({
-  components: { InputEmail, InputPassword, ButtonLabel },
+  components: { InputEmail, ButtonLabel },
 })
 export default class LoginView extends Vue {
   user = {
     email: "",
-    senha: "",
   };
 
   validationRules = {
     email: [{ required: true, message: "Por favor, insira seu e-mail." }],
-    senha: [{ required: true, message: "Por favor, insira sua senha." }],
   };
 
   get errors() {
