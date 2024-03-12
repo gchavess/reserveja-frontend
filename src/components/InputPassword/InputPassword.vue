@@ -1,0 +1,34 @@
+<template>
+  <input
+    type="password"
+    v-model="value"
+    placeholder="Digite sua senha"
+    :class="{ 'input-error': passwordError, input: true }"
+  />
+</template>
+
+<script>
+import { Component, Vue, Watch } from "vue-facing-decorator";
+
+@Component({
+  components: {},
+  emits: ["value"],
+})
+export default class InputPassword extends Vue {
+  value = "";
+  passwordError = false;
+
+  @Watch("value")
+  valueWatcher() {
+    this.validatePassword();
+    this.$emit("value", this.value);
+  }
+
+  validatePassword() {
+    const minLength = 6;
+    this.passwordError = this.value.length < minLength;
+  }
+}
+</script>
+
+<style></style>

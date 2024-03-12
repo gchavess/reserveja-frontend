@@ -1,0 +1,29 @@
+.input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  border: 1.5px solid #d9d9d9;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  color: #8d8d8d;
+  background-color: #f8f8f8;
+  transition: border-color 0.3s ease;
+}
+
+.input::placeholder {
+  color: #8d8d8d;
+}
+
+.input:hover {
+  border-color: #f4a266;
+}
+
+.input:focus {
+  border-color: #f4a266;
+  outline: none;
+}
+
+.input-error {
+  border-color: #ff0000 !important;
+}

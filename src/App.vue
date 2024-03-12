@@ -12,12 +12,28 @@
 export default {
   name: "App",
   components: {},
-  methods: {
-    handleClick() {
-      console.log("Button clicked");
-    },
-  },
+  methods: {},
 };
 </script>
 
-<style></style>
+<style>
+@import "@/assets/styles/input.scss";
+@import "@/assets/styles/title.scss";
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #eeeeee;
+}
+
+a {
+  color: #555555;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #f4a266;
+}
+</style>
