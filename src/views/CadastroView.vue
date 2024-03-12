@@ -2,17 +2,22 @@
   <div class="container">
     <div class="container-login">
       <div class="content">
-        <span class="title">Seja bem-vindo ao ReserveJá!</span>
+        <span class="title">Cadastro</span>
         <input-email @value="user.email = $event" />
         <input-password @value="user.senha = $event"></input-password>
+        <input-password
+          @value="user.confirmeSenha = $event"
+          :placeholder="'Confirme sua senha'"
+        ></input-password>
 
-        <button-label :label="'Entrar'" :disabled="!formValid"></button-label>
+        <button-label
+          :label="'Inscreva-se agora'"
+          :disabled="!formValid"
+        ></button-label>
 
         <div class="container-botoes">
-          <a href="#">Esqueceu sua senha?</a>
           <span class="texto-cadastro"
-            >Não tem uma conta?
-            <a href="/cadastro">Increver-se no ReserveJá</a></span
+            >Já tem uma conta? <a href="/login">Faça login</a></span
           >
         </div>
       </div>
@@ -34,11 +39,15 @@ export default class LoginView extends Vue {
   user = {
     email: "",
     senha: "",
+    confirmeSenha: "",
   };
 
   validationRules = {
     email: [{ required: true, message: "Por favor, insira seu e-mail." }],
     senha: [{ required: true, message: "Por favor, insira sua senha." }],
+    confirmeSenha: [
+      { required: true, message: "Por favor, insira sua senha." },
+    ],
   };
 
   get errors() {
