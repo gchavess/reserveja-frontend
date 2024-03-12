@@ -2,19 +2,22 @@
   <input
     type="password"
     v-model="value"
-    placeholder="Digite sua senha"
+    :placeholder="placeholder"
     :class="{ 'input-error': passwordError, input: true }"
   />
 </template>
 
 <script>
-import { Component, Vue, Watch } from "vue-facing-decorator";
+import { Component, Vue, Watch, Prop } from "vue-facing-decorator";
 
 @Component({
   components: {},
   emits: ["value"],
 })
 export default class InputPassword extends Vue {
+  @Prop({ default: "Digite sua senha" })
+  placeholder;
+
   value = "";
   passwordError = false;
 
