@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import "@fortawesome/fontawesome-free/css/all.css";
+
 export default {
   name: "App",
   components: {},
@@ -19,6 +21,8 @@ export default {
 <style>
 @import "@/assets/styles/input.scss";
 @import "@/assets/styles/title.scss";
+@import "@/assets/styles/spacing.scss";
+@import "@/assets/styles/span.scss";
 
 html,
 body {

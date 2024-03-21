@@ -2,17 +2,25 @@
   <div class="container">
     <div class="container-login">
       <div class="content">
-        <span class="title">Seja bem-vindo ao ReserveJá!</span>
+        <span class="title">Cadastro</span>
         <input-email @value="user.email = $event" />
         <input-password @value="user.senha = $event"></input-password>
+        <input-password
+          @value="user.confirmeSenha = $event"
+          :placeholder="'Confirme sua senha'"
+        ></input-password>
 
-        <button-label :label="'Entrar'" :disabled="!formValid"></button-label>
+        <button-label
+          class="botao-inscreva-se"
+          :label="'Inscreva-se agora'"
+          :disabled="!formValid"
+          :widthCemPorCentro="true"
+        ></button-label>
 
         <div class="container-botoes">
-          <a href="#">Esqueceu sua senha?</a>
           <span class="texto-cadastro"
-            >Não tem uma conta?
-            <a href="/cadastro">Increver-se no ReserveJá</a></span
+            >Já tem uma conta?
+            <router-link to="/login">Faça login</router-link></span
           >
         </div>
       </div>
@@ -34,11 +42,15 @@ export default class LoginView extends Vue {
   user = {
     email: "",
     senha: "",
+    confirmeSenha: "",
   };
 
   validationRules = {
     email: [{ required: true, message: "Por favor, insira seu e-mail." }],
     senha: [{ required: true, message: "Por favor, insira sua senha." }],
+    confirmeSenha: [
+      { required: true, message: "Por favor, insira sua senha." },
+    ],
   };
 
   get errors() {
@@ -51,7 +63,7 @@ export default class LoginView extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .container {
   display: flex;
   justify-content: center;
@@ -61,9 +73,10 @@ export default class LoginView extends Vue {
 
 .container-login {
   width: 500px;
-  height: calc(100vh - 200px);
   background-color: #fff;
   border-radius: 20px;
+  padding-top: 50px;
+  padding-bottom: 50px;
 }
 
 .content {
@@ -81,6 +94,10 @@ export default class LoginView extends Vue {
   flex-direction: column;
   align-items: center;
   padding-top: 200px;
+}
+
+.botao-inscreva-se {
+  margin-top: 20px;
 }
 
 .texto-cadastro {

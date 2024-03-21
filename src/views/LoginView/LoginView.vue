@@ -2,22 +2,23 @@
   <div class="container">
     <div class="container-login">
       <div class="content">
-        <span class="title">Cadastro</span>
+        <span class="title">Seja bem-vindo ao ReserveJá!</span>
         <input-email @value="user.email = $event" />
         <input-password @value="user.senha = $event"></input-password>
-        <input-password
-          @value="user.confirmeSenha = $event"
-          :placeholder="'Confirme sua senha'"
-        ></input-password>
 
         <button-label
-          :label="'Inscreva-se agora'"
+          class="botao-entrar"
+          :label="'Entrar'"
           :disabled="!formValid"
+          :widthCemPorCentro="true"
+          @click="entrar()"
         ></button-label>
 
         <div class="container-botoes">
+          <a href="#">Esqueceu sua senha?</a>
           <span class="texto-cadastro"
-            >Já tem uma conta? <a href="/login">Faça login</a></span
+            >Não tem uma conta?
+            <router-link to="/cadastro">Faça login</router-link></span
           >
         </div>
       </div>
@@ -39,15 +40,11 @@ export default class LoginView extends Vue {
   user = {
     email: "",
     senha: "",
-    confirmeSenha: "",
   };
 
   validationRules = {
     email: [{ required: true, message: "Por favor, insira seu e-mail." }],
     senha: [{ required: true, message: "Por favor, insira sua senha." }],
-    confirmeSenha: [
-      { required: true, message: "Por favor, insira sua senha." },
-    ],
   };
 
   get errors() {
@@ -57,10 +54,16 @@ export default class LoginView extends Vue {
   get formValid() {
     return this.errors.errorCount === 0;
   }
+
+  entrar() {
+    if (this.formValid) {
+      this.$router.push("/home");
+    }
+  }
 }
 </script>
 
-<style>
+<style scoped>
 .container {
   display: flex;
   justify-content: center;
@@ -70,9 +73,10 @@ export default class LoginView extends Vue {
 
 .container-login {
   width: 500px;
-  height: calc(100vh - 200px);
   background-color: #fff;
   border-radius: 20px;
+  padding-top: 50px;
+  padding-bottom: 50px;
 }
 
 .content {
@@ -90,6 +94,10 @@ export default class LoginView extends Vue {
   flex-direction: column;
   align-items: center;
   padding-top: 200px;
+}
+
+.botao-entrar {
+  margin-top: 20px;
 }
 
 .texto-cadastro {
