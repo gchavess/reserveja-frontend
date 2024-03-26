@@ -23,6 +23,7 @@ export default {
 @import "@/assets/styles/title.scss";
 @import "@/assets/styles/spacing.scss";
 @import "@/assets/styles/span.scss";
+@import "@/assets/styles/divider.scss";
 
 html,
 body {
@@ -39,5 +40,9 @@ a {
 
 a:hover {
   color: #f4a266;
+}
+
+hr {
+  color: #555555;
 }
 </style>

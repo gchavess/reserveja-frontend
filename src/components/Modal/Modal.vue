@@ -3,31 +3,56 @@
     <div class="modal-background" @click="closeModal"></div>
     <div class="modal-content">
       <div class="box">
+        <span class="title-secondary">{{ titulo }}</span>
+
+        <div class="divider mt-4 mb-4"></div>
+
         <slot></slot>
-        <button
-          class="modal-close"
-          aria-label="close"
-          @click="closeModal"
-        ></button>
+
+        <div class="divider mt-4 mb-4"></div>
+
+        <div class="footer-modal">
+          <button-label
+            :label="'Fechar'"
+            :widthCemPorCentro="false"
+            :cor="'secundaria'"
+            @click="fecharModal()"
+          ></button-label>
+
+          <button-label
+            :label="'Confirmar'"
+            :widthCemPorCentro="false"
+            :cor="'primaria'"
+            class="ml-4"
+            @click="confirmar()"
+          ></button-label>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-facing-decorator";
+import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 
-@Component
+@Component({
+  components: { ButtonLabel },
+  emits: ["fecharModal", "confirmar"],
+})
 export default class Modal extends Vue {
+  @Prop()
+  titulo = "";
+
   @Prop()
   modalAberta = false;
 
-  openModal() {
-    this.modalAberta = true;
+  confirmar() {
+    this.$emit("confirmar");
   }
 
-  closeModal() {
-    this.modalAberta = false;
+  fecharModal() {
+    this.$emit("fecharModal", true);
   }
 }
 </script>
@@ -67,14 +92,8 @@ export default class Modal extends Vue {
   max-width: 80%;
 }
 
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5rem;
-  color: #333;
+.footer-modal {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
