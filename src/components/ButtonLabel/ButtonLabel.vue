@@ -2,7 +2,9 @@
   <button
     class="btn"
     :disabled="disabled"
-    :style="widthCemPorCentro ? 'width: 100%' : ''"
+    :style="
+      (widthCemPorCentro ? 'width: 100%' : '', `background-color: ${color}`)
+    "
   >
     {{ label }}
   </button>
@@ -24,12 +26,24 @@ export default class Button extends Vue {
 
   @Prop()
   widthCemPorCentro = false;
+
+  @Prop()
+  cor = "primaria";
+
+  get color() {
+    if (this.cor == "primaria") {
+      return "#f4a266";
+    } else if (this.cor == "secundaria") {
+      return "#C9C9C9";
+    } else {
+      return "#f4a266";
+    }
+  }
 }
 </script>
 
 <style>
 .btn {
-  background-color: #f4a266;
   color: white;
   padding: 14px 20px;
   border: none;

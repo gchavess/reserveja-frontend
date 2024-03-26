@@ -3,8 +3,11 @@
     <div class="container-login">
       <div class="content">
         <span class="title">Seja bem-vindo ao ReserveJá!</span>
-        <input-email @value="user.email = $event" />
-        <input-password @value="user.senha = $event"></input-password>
+        <input-email class="mt-4" @value="user.email = $event" />
+        <input-password
+          class="mt-4"
+          @value="user.senha = $event"
+        ></input-password>
 
         <button-label
           class="botao-entrar"

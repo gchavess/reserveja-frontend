@@ -3,9 +3,13 @@
     <div class="container-login">
       <div class="content">
         <span class="title">Cadastro</span>
-        <input-email @value="user.email = $event" />
-        <input-password @value="user.senha = $event"></input-password>
+        <input-email class="mt-4" @value="user.email = $event" />
         <input-password
+          class="mt-4"
+          @value="user.senha = $event"
+        ></input-password>
+        <input-password
+          class="mt-4"
           @value="user.confirmeSenha = $event"
           :placeholder="'Confirme sua senha'"
         ></input-password>
