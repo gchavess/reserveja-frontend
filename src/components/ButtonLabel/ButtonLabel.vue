@@ -1,5 +1,11 @@
 <template>
-  <button class="btn" :disabled="disabled">{{ label }}</button>
+  <button
+    class="btn"
+    :disabled="disabled"
+    :style="widthCemPorCentro ? 'width: 100%' : ''"
+  >
+    {{ label }}
+  </button>
 </template>
 
 <script>
@@ -15,6 +21,9 @@ export default class Button extends Vue {
 
   @Prop()
   disabled = false;
+
+  @Prop()
+  widthCemPorCentro = false;
 }
 </script>
 
@@ -23,11 +32,9 @@ export default class Button extends Vue {
   background-color: #f4a266;
   color: white;
   padding: 14px 20px;
-  margin-top: 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 100%;
   font-size: 16px;
   transition: background-color 0.3s ease;
 }
