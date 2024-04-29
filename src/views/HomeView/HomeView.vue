@@ -22,14 +22,19 @@
     </div>
 
     <div class="container-cards-sala pl-4">
-      <div v-for="sala of listaSalas" :key="sala.id" class="card-sala">
+      <div
+        v-for="sala of listaSalas"
+        :key="sala.id"
+        class="card-sala"
+        @click="entrarSala(sala.id)"
+      >
         <div class="content-card-sala">
           <div style="display: flex" class="centralizar">
             <span class="span-24">{{ sala.descricao }}</span>
 
             <i
               class="fa-solid fa-trash icone-excluir-sala"
-              @click="onExcluirSala()"
+              @click.stop="onExcluirSala()"
             ></i>
           </div>
           <span class="span-14"
@@ -64,9 +69,9 @@ export default class HomeView extends Vue {
 
   listaSalas = [
     { id: 1, descricao: "Sala 1", numeroParcitipantes: 3 },
-    { id: 1, descricao: "Sala 2", numeroParcitipantes: 90 },
-    { id: 1, descricao: "Sala 3", numeroParcitipantes: 9 },
-    { id: 1, descricao: "Sala 4", numeroParcitipantes: 26 },
+    { id: 2, descricao: "Sala 2", numeroParcitipantes: 90 },
+    { id: 3, descricao: "Sala 3", numeroParcitipantes: 9 },
+    { id: 4, descricao: "Sala 4", numeroParcitipantes: 26 },
   ];
 
   onCriarSala() {
@@ -77,6 +82,10 @@ export default class HomeView extends Vue {
   onExcluirSala() {
     this.acaoBotaoSalas = "excluir";
     this.modalCriarSalaAberta = true;
+  }
+
+  entrarSala(salaId) {
+    this.$router.push("/sala/" + salaId);
   }
 }
 </script>
