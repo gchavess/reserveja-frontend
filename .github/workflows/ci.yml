@@ -1,0 +1,33 @@
+name: Pipeline de Integração Contínua
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v2
+
+      - name: Instalar Dependências
+        run: npm install
+
+      - name: Analisar Qualidade do Código
+        run: npm run lint
+
+      - name: Build da Aplicação Vue.js
+        run: npm run build
+
+      - name: Empacotar Artefatos
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+
+      - name: Notificar sobre o Build
+        if: ${{ always() }}
+        run: echo "O build foi concluído com sucesso!"

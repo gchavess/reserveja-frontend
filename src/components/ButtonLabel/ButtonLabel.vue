@@ -2,9 +2,10 @@
   <button
     class="btn"
     :disabled="disabled"
-    :style="
-      (widthCemPorCentro ? 'width: 100%' : '', `background-color: ${color}`)
-    "
+    :style="{
+      width: widthCemPorCentro ? '100%' : 'auto',
+      backgroundColor: color,
+    }"
   >
     {{ label }}
   </button>
