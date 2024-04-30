@@ -1,4 +1,4 @@
-export function validateForm(formData, validationRules) {
+export function validateForm(formData, validationRules){
   const errors = {};
   let errorCount = 0;
 
