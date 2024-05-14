@@ -12,7 +12,7 @@
         </div>
 
         <div class="tag-usuario centralizar">
-          <span class="span-24">Gustavo</span>
+          <span class="span-24">{{ usuario?.name }}</span>
           <i
             class="fa-solid fa-ellipsis-vertical pl-4"
             style="color: #555555"
@@ -30,17 +30,15 @@
       >
         <div class="content-card-sala">
           <div style="display: flex" class="centralizar">
-            <span class="span-24">{{ sala.descricao }}</span>
-
-            <i
-              class="fa-solid fa-trash icone-excluir-sala"
-              @click.stop="onExcluirSala()"
-            ></i>
+            <span class="span-24" style="padding-top: 10px">{{
+              sala.name
+            }}</span>
           </div>
-          <span class="span-14"
-            >Número de Participantes: {{ sala.numeroParcitipantes }}</span
-          >
         </div>
+        <i
+          class="fa-solid fa-trash icone-excluir-sala"
+          @click.stop="onExcluirSala(sala)"
+        ></i>
       </div>
     </div>
   </div>
@@ -48,7 +46,9 @@
   <criar-sala-modal
     :modalAberta="modalCriarSalaAberta"
     :acaoBotao="acaoBotaoSalas"
-    @modalAberta="modalCriarSalaAberta = $event"
+    :salaProp="salaSelecionada"
+    @recarregar="getRooms"
+    @modalAberta="(modalCriarSalaAberta = $event), console.log('modalAberta')"
   ></criar-sala-modal>
 </template>
 
@@ -58,6 +58,7 @@ import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import Modal from "@/components/Modal/Modal.vue";
 import InputText from "@/components/InputText/InputText.vue";
 import CriarSalaModal from "@/views/HomeView/modal/CriarSalaModal.vue";
+import RoomService from "@/services/RoomService.js";
 
 @Component({
   components: { ButtonLabel, Modal, InputText, CriarSalaModal },
@@ -67,21 +68,42 @@ export default class HomeView extends Vue {
 
   acaoBotaoSalas = "criar";
 
-  listaSalas = [
-    { id: 1, descricao: "Sala 1", numeroParcitipantes: 3 },
-    { id: 2, descricao: "Sala 2", numeroParcitipantes: 90 },
-    { id: 3, descricao: "Sala 3", numeroParcitipantes: 9 },
-    { id: 4, descricao: "Sala 4", numeroParcitipantes: 26 },
-  ];
+  listaSalas = [];
+
+  salaSelecionada;
+
+  usuario;
+
+  mounted() {
+    this.usuario = JSON.parse(localStorage.getItem("usuario"));
+    this.getRooms();
+  }
+
+  async getRooms() {
+    try {
+      const response = await RoomService.getRooms();
+      console.log("reponse", response);
+      this.listaSalas = response;
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        console.error(
+          "Usuário não autorizado. Por favor, faça login novamente."
+        );
+      } else {
+        console.error("Ocorreu um erro:", error);
+      }
+    }
+  }
 
   onCriarSala() {
     this.acaoBotaoSalas = "criar";
     this.modalCriarSalaAberta = true;
   }
 
-  onExcluirSala() {
+  onExcluirSala(sala) {
     this.acaoBotaoSalas = "excluir";
     this.modalCriarSalaAberta = true;
+    this.salaSelecionada = sala;
   }
 
   entrarSala(salaId) {
@@ -146,8 +168,8 @@ export default class HomeView extends Vue {
 
 .icone-excluir-sala {
   position: absolute;
-  padding-left: 100px;
   color: #555555;
-  margin-top: -4px;
+  margin-top: -45px;
+  margin-left: 162px;
 }
 </style>

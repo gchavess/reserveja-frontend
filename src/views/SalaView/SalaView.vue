@@ -124,6 +124,8 @@ export default class SalaView extends Vue {
       { id: 1, ocupado: true },
       { id: 2, ocupado: true },
       { id: 3, itemAuxiliar: true },
+      { id: 1, ocupado: true },
+      { id: 2, ocupado: true },
     ],
     [
       { id: 1, ocupado: true },
@@ -137,11 +139,15 @@ export default class SalaView extends Vue {
       { id: 1, ocupado: true },
       { id: 2, ocupado: true },
       { id: 3, itemAuxiliar: true },
+      { id: 1, ocupado: true },
+      { id: 2, ocupado: true },
     ],
     [
       { id: 1, ocupado: true },
       { id: 2, ocupado: true },
       { id: 3, itemAuxiliar: true },
+      { id: 1, ocupado: true },
+      { id: 2, ocupado: true },
     ],
   ];
 }

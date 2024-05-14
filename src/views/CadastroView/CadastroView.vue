@@ -4,14 +4,16 @@
       <div class="content">
         <span class="title">Cadastro</span>
         <input-email class="mt-4" @value="user.email = $event" />
+
+        <input-text
+          class="mt-4"
+          @value="user.name = $event"
+          :placeholder="'Digite seu nome'"
+        ></input-text>
+
         <input-password
           class="mt-4"
-          @value="user.senha = $event"
-        ></input-password>
-        <input-password
-          class="mt-4"
-          @value="user.confirmeSenha = $event"
-          :placeholder="'Confirme sua senha'"
+          @value="user.password = $event"
         ></input-password>
 
         <button-label
@@ -19,6 +21,7 @@
           :label="'Inscreva-se agora'"
           :disabled="!formValid"
           :widthCemPorCentro="true"
+          @click="criarUsuario()"
         ></button-label>
 
         <div class="container-botoes">
@@ -38,23 +41,23 @@ import InputEmail from "@/components/InputEmail/InputEmail.vue";
 import InputPassword from "@/components/InputPassword/InputPassword.vue";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import { validateForm } from "@/utils/FormUtils.js";
+import UserService from "@/services/UserService.js";
+import InputText from "@/components/InputText/InputText.vue";
 
 @Component({
-  components: { InputEmail, InputPassword, ButtonLabel },
+  components: { InputEmail, InputPassword, ButtonLabel, InputText },
 })
 export default class LoginView extends Vue {
   user = {
     email: "",
-    senha: "",
-    confirmeSenha: "",
+    name: "",
+    password: "",
   };
 
   validationRules = {
     email: [{ required: true, message: "Por favor, insira seu e-mail." }],
-    senha: [{ required: true, message: "Por favor, insira sua senha." }],
-    confirmeSenha: [
-      { required: true, message: "Por favor, insira sua senha." },
-    ],
+    password: [{ required: true, message: "Por favor, insira sua senha." }],
+    name: [{ required: true, message: "Por favor, insira seu nome." }],
   };
 
   get errors() {
@@ -63,6 +66,17 @@ export default class LoginView extends Vue {
 
   get formValid() {
     return this.errors.errorCount === 0;
+  }
+
+  criarUsuario() {
+    if (this.formValid) {
+      try {
+        UserService.createUser(this.user);
+        this.$router.push("/login");
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 }
 </script>

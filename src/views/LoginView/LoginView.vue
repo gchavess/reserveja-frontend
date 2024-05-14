@@ -6,7 +6,7 @@
         <input-email class="mt-4" @value="user.email = $event" />
         <input-password
           class="mt-4"
-          @value="user.senha = $event"
+          @value="user.password = $event"
         ></input-password>
 
         <button-label
@@ -18,10 +18,9 @@
         ></button-label>
 
         <div class="container-botoes">
-          <a href="#">Esqueceu sua senha?</a>
           <span class="texto-cadastro"
             >Não tem uma conta?
-            <router-link to="/cadastro">Faça login</router-link></span
+            <router-link to="/cadastro">Cadastra-se já!</router-link></span
           >
         </div>
       </div>
@@ -35,6 +34,7 @@ import InputEmail from "@/components/InputEmail/InputEmail.vue";
 import InputPassword from "@/components/InputPassword/InputPassword.vue";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import { validateForm } from "@/utils/FormUtils.js";
+import AuthService from "@/services/AuthService.js";
 
 @Component({
   components: { InputEmail, InputPassword, ButtonLabel },
@@ -42,12 +42,12 @@ import { validateForm } from "@/utils/FormUtils.js";
 export default class LoginView extends Vue {
   user = {
     email: "",
-    senha: "",
+    password: "",
   };
 
   validationRules = {
     email: [{ required: true, message: "Por favor, insira seu e-mail." }],
-    senha: [{ required: true, message: "Por favor, insira sua senha." }],
+    password: [{ required: true, message: "Por favor, insira sua senha." }],
   };
 
   get errors() {
@@ -58,9 +58,24 @@ export default class LoginView extends Vue {
     return this.errors.errorCount === 0;
   }
 
-  entrar() {
+  async entrar() {
     if (this.formValid) {
-      this.$router.push("/home");
+      try {
+        const response = await AuthService.login(this.user);
+        if (response.status === 200) {
+          localStorage.setItem("usuario", JSON.stringify(response.data.user));
+
+          this.$router.push("/home");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          console.error(
+            "Usuário não autorizado. Por favor, faça login novamente."
+          );
+        } else {
+          console.error("Ocorreu um erro:", error);
+        }
+      }
     }
   }
 }

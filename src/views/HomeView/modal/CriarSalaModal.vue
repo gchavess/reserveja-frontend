@@ -3,11 +3,11 @@
     :modalAberta="modalAberta"
     :titulo="tituloModal"
     @fecharModal="fecharModal()"
-    @confirmar="fecharModal()"
+    @confirmar="acaoBotao == 'criar' ? criarSala() : deletarSala()"
   >
     <div class="container-modal" v-if="acaoBotao == 'criar'">
       <input-text
-        @value="sala.nome = $event"
+        @value="sala.name = $event"
         :placeholder="'Nome da Sala'"
       ></input-text>
     </div>
@@ -26,9 +26,11 @@ import { Component, Vue, Prop } from "vue-facing-decorator";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import Modal from "@/components/Modal/Modal.vue";
 import InputText from "@/components/InputText/InputText.vue";
+import RoomService from "@/services/RoomService.js";
 
 @Component({
   components: { ButtonLabel, Modal, InputText },
+  emits: ["recarregar", "modalAberta"],
 })
 export default class CriarSalaModal extends Vue {
   @Prop()
@@ -37,8 +39,13 @@ export default class CriarSalaModal extends Vue {
   @Prop()
   acaoBotao = "criar";
 
+  @Prop()
+  salaProp;
+
   sala = {
-    nome: "",
+    name: "",
+    userId: 1,
+    reservaUserId: 1,
   };
 
   get tituloModal() {
@@ -48,6 +55,26 @@ export default class CriarSalaModal extends Vue {
       return "Excluir Sala";
     } else {
       return "";
+    }
+  }
+
+  async criarSala() {
+    try {
+      await RoomService.createRoom(this.sala);
+      this.$emit("recarregar");
+      this.fecharModal();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async deletarSala() {
+    try {
+      await RoomService.deleteRoom(this.salaProp.id);
+      this.$emit("recarregar");
+      this.fecharModal();
+    } catch (error) {
+      console.error(error);
     }
   }
 

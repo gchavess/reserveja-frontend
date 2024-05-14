@@ -5,6 +5,7 @@ import HomeView from "@/views/HomeView/HomeView.vue";
 import SalaView from "@/views/SalaView/SalaView.vue";
 
 const routes = [
+  { path: "/", component: LoginView },
   { path: "/login", component: LoginView },
   { path: "/cadastro", component: CadastroView },
   { path: "/home", component: HomeView },
