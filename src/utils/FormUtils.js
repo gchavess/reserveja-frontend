@@ -15,5 +15,5 @@ export function validateForm(formData, validationRules) {
   }
 
   return { errors, errorCount };
-
 }
+lll
