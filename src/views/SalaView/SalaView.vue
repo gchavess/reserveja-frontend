@@ -108,6 +108,7 @@
 import { Component, Vue } from "vue-facing-decorator";
 import Cadeira from "@/components/Cadeira/Cadeira.vue";
 import ReservarSalaModal from "@/views/SalaView/modal/ReservarSalaModal.vue";
+import TableRoomService from "@/services/TableRoomService.js";
 
 @Component({
   components: { Cadeira, ReservarSalaModal },
@@ -116,40 +117,48 @@ export default class SalaView extends Vue {
   modalAbertaReservarSala = false;
   mesaHover = null;
 
-  listaMesas = [
-    [
-      { id: 1, ocupado: false },
-      { id: 2, ocupado: true },
-      { id: 3, itemAuxiliar: true },
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-      { id: 3, itemAuxiliar: true },
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-    ],
-    [
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-      { id: 3, itemAuxiliar: true },
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-      { id: 3, itemAuxiliar: true },
-    ],
-    [
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-      { id: 3, itemAuxiliar: true },
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-    ],
-    [
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-      { id: 3, itemAuxiliar: true },
-      { id: 1, ocupado: true },
-      { id: 2, ocupado: true },
-    ],
-  ];
+  listaMesas = [];
+
+  mounted() {
+    this.getTableRooms();
+  }
+
+  async getTableRooms() {
+    console.log("gettt");
+    try {
+      const response = await TableRoomService.getTableRoom();
+      console.log("getTableRooms response", response);
+
+      // Verificar se a resposta está vazia ou se não contém dados
+      if (!response || response.length === 0) {
+        console.log("Resposta vazia ou sem dados.");
+        return;
+      }
+
+      // Objeto para armazenar os arrays de objetos agrupados por linha
+      const objetosPorLinha = {};
+
+      // Iterar sobre cada objeto na resposta
+      response.forEach((obj) => {
+        // Verificar se já existe um array para a linha atual
+        if (!objetosPorLinha[obj.column]) {
+          // Se não existir, criar um novo array com este objeto
+          objetosPorLinha[obj.column] = [obj];
+        } else {
+          // Se já existir, adicionar este objeto ao array existente
+          objetosPorLinha[obj.column].push(obj);
+        }
+      });
+
+      // Converter o objeto em um array e armazenar na variável listaMesas
+      this.listaMesas = Object.values(objetosPorLinha);
+
+      // Verificar a variável listaMesas
+      console.log("listaMesas:", this.listaMesas);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
 </script>
 
