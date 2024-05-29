@@ -9,35 +9,33 @@ jobs:
   build:
     runs-on: ubuntu-latest # Define que o trabalho será executado em um ambiente Ubuntu
 
-    defaults:
-      run:
-        shell: bash -eux {0}
-
     steps:
-      - name: Setup Node.js # configura o ambiente Node.js
+      - name: Checkout do Código
+        uses: actions/checkout@v2 # Utiliza a ação oficial para realizar o checkout do código
+
+      - name: Setup Node.js # Configuração do ambiente Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "16" # configura a versão 16 do Node.js
-
-      - name: Checkout do Código
-        uses: actions/checkout@v2 # Utiliza a ação oficial para realizar o checkout do código
 
       - name: Instalar Dependências
         run: npm install --legacy-peer-deps # Executa o comando npm para instalar as dependências do projeto, incluindo dependências legadas
 
       - name: Analisar Qualidade do Código
-        run: npm run lint # Executa o comando npm para realizar análise de qualidade estática do código
-        continue-on-error: true # Continua mesmo se houver erro
-
-      - name: Verificar Erros de Linting
         run: |
+          npm run lint
           if [ $? -ne 0 ]; then
-            echo "Erro de linting encontrado. A pipeline será interrompida."
+            echo "Erro de linting encontrado. O push será bloqueado."
             exit 1
           fi
 
       - name: Build da Aplicação Vue.js
-        run: npm run build # Executa o comando npm para compilar a aplicação Vue.js
+        run: |
+          npm run build
+          if [ $? -ne 0 ]; then
+            echo "Erro de build encontrado. O push será bloqueado."
+            exit 1
+          fi
 
       - name: Verificar Erros de Build
         run: |
