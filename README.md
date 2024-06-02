@@ -51,7 +51,8 @@ Depois de executar o comando yarn serve ou npm run serve, abra o seu navegador e
 http://localhost:8080/
 ```
 
-Contato Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em contato pelo email: gustavojchaves1@gmail.com
+### Contato
+Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em contato pelo email: gustavojchaves1@gmail.com
 
 
 
