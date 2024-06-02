@@ -24,7 +24,10 @@ yarn
 ```
 
 ### Usando NPM
+
+```bash
 npm install
+```
 
 ### 3. Executar o Projeto
 
