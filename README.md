@@ -18,12 +18,12 @@ git clone https://github.com/gchavess/reserveja-frontend.git
 
 Depois de clonar o repositório, navegue até a pasta do projeto e instale as dependências utilizando o Yarn ou NPM.
 
-# Usando Yarn
+### Usando Yarn
 ```bash
 yarn
 ```
 
-# Usando NPM
+### Usando NPM
 npm install
 
 ### 3. Executar o Projeto
