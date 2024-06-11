@@ -52,6 +52,7 @@ export default class Button extends Vue {
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
+  height: 50px;
 }
 
 .btn:hover {
