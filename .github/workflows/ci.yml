@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js # Configuração do ambiente Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16" # Utiliza a ação oficial para configurar a versão 16 do Node.js
+          node-version: "16" # configura a versão 16 do Node.js
 
       - name: Instalar Dependências
         run: npm install --legacy-peer-deps # Executa o comando npm para instalar as dependências do projeto, incluindo dependências legadas
@@ -37,12 +37,18 @@ jobs:
             exit 1
           fi
 
+      - name: Verificar Erros de Build
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "Erro de build encontrado. A pipeline será interrompida."
+            exit 1
+          fi
+
       - name: Empacotar Artefatos # Empacotamento dos artefatos gerados
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: dist
-        # Utiliza a ação oficial para empacotar e fazer upload dos artefatos gerados na pasta "dist"
+          path: dist # Utiliza a ação oficial para empacotar e fazer upload dos artefatos gerados na pasta "dist"
 
       - name: Notificar sobre o Build
         if: ${{ always() }}
