@@ -21,6 +21,7 @@ Depois de clonar o repositório, navegue até a pasta do projeto e instale as de
 ### Usando Yarn
 ```bash
 yarn
+
 ```
 
 ### Usando NPM
