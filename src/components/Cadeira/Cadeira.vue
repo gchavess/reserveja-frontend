@@ -51,12 +51,16 @@ export default class Button extends Vue {
   background-color: red !important;
 }
 
-/* Pernas da cadeira */
 .perneira {
   position: absolute;
   width: 10px;
   height: 30px;
   background-color: green;
+}
+
+.cadeira:hover .assento,
+.cadeira:hover .perneira {
+  background-color: rgb(209, 209, 209);
 }
 
 .perneira.esquerda {
