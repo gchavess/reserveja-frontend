@@ -24,14 +24,14 @@
     <div class="container-cards-sala pl-4">
       <div
         v-for="sala of listaSalas"
-        :key="sala.id"
+        :key="sala.Rooms.id"
         class="card-sala"
-        @click="entrarSala(sala.id)"
+        @click="entrarSala(sala.Rooms.id)"
       >
         <div class="content-card-sala">
           <div style="display: flex" class="centralizar">
             <span class="span-24" style="padding-top: 10px">{{
-              sala.name
+              sala.Rooms?.name
             }}</span>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default class HomeView extends Vue {
 
   async getRooms() {
     try {
-      const response = await RoomService.getRooms();
+      const response = await RoomService.getRooms(this.usuario.id);
       console.log("reponse", response);
       this.listaSalas = response;
     } catch (error) {
@@ -145,13 +145,16 @@ export default class HomeView extends Vue {
 
 .container-cards-sala {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 100px;
 }
 
 .card-sala {
-  width: 200px;
-  height: 200px;
+  min-width: 200px;
+  min-height: 200px;
+  max-width: 200px;
+  max-height: 200px;
   background: #fff;
   border: 1px solid #f4a266;
 }

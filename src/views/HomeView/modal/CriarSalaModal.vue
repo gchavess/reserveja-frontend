@@ -8,7 +8,9 @@
     <div class="container-modal" v-if="acaoBotao == 'criar'">
       <input-text
         @value="sala.name = $event"
+        :value="sala.name"
         :placeholder="'Nome da Sala'"
+        :key="keyInput"
       ></input-text>
     </div>
 
@@ -22,7 +24,7 @@
 </template>
 
 <script>
-import { Component, Vue, Prop } from "vue-facing-decorator";
+import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import Modal from "@/components/Modal/Modal.vue";
 import InputText from "@/components/InputText/InputText.vue";
@@ -42,6 +44,10 @@ export default class CriarSalaModal extends Vue {
   @Prop()
   salaProp;
 
+  usuario;
+
+  keyInput = 0;
+
   sala = {
     name: "",
     userId: 1,
@@ -58,9 +64,25 @@ export default class CriarSalaModal extends Vue {
     }
   }
 
+  @Watch("modalAberta")
+  onModalAbertaChange() {
+    if (this.modalAberta) {
+      this.resetarFormulario();
+    }
+  }
+
+  mounted() {
+    this.usuario = JSON.parse(localStorage.getItem("usuario"));
+  }
+
   async criarSala() {
     try {
-      await RoomService.createRoom(this.sala);
+      await RoomService.createRoom({
+        ...this.sala,
+        userId: this.usuario.id,
+        reservaUserId: this.usuario.id,
+      });
+
       this.$emit("recarregar");
       this.fecharModal();
     } catch (error) {
@@ -76,6 +98,10 @@ export default class CriarSalaModal extends Vue {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  resetarFormulario() {
+    this.keyInput++;
   }
 
   fecharModal() {

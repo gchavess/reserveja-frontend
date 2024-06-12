@@ -7,6 +7,10 @@ const UserService = {
     const response = await axios.post(`${API_URL}/users`, userData);
     return response.data;
   },
+  getUsers: async () => {
+    const response = await axios.get(`${API_URL}/users`);
+    return response.data;
+  },
 };
 
 export default UserService;

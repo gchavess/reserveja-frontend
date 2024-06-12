@@ -7,6 +7,12 @@ const tableRoom = {
     const response = await axios.get(`${API_URL}/tableRoom`);
     return response.data;
   },
+  getAllTablesRoomByDateAndUser: async (userId, date, roomId) => {
+    const response = await axios.get(
+      `${API_URL}/tableRoom/user/${userId}/date/${date}/room/${roomId}`
+    );
+    return response.data;
+  },
   createTableRoom: async (tableRoomata) => {
     const response = await axios.post(`${API_URL}/tableRoom`, tableRoomata);
     return response.data;

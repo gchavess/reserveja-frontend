@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="toolbar">
+      <!--
       <button-label
         :label="modoAdministrador ? 'Modo Usuário' : 'Modo Administrador'"
         :widthCemPorCentro="false"
@@ -8,6 +9,22 @@
         class="ml-4"
         @click="modoAdministrador = !modoAdministrador"
       ></button-label>
+      -->
+      <i
+        class="fa fa-chevron-left"
+        style="margin-left: 20px; color: #555555"
+        @click="voltar()"
+      ></i>
+
+      <div style="margin-left: 30px">
+        <button-label
+          :label="'Convidar Participante'"
+          :widthCemPorCentro="false"
+          :cor="'primaria'"
+          class="ml-4"
+          @click="abrirModalConvidarParticipar()"
+        ></button-label>
+      </div>
 
       <div class="tag-usuario centralizar">
         <span class="span-24">{{ usuario?.name }}</span>
@@ -19,7 +36,22 @@
     </div>
 
     <div class="content-salas mt-4 ml-4">
-      <div class="coluna-container">
+      <div
+        class="date-filter-container"
+        style="position: fixed; right: 20px; margin-top: 10px"
+      >
+        <label for="date-filter" class="date-filter-label"
+          >Selecione uma data:</label
+        >
+        <input
+          type="date"
+          id="date-filter"
+          v-model="dataFiltrada"
+          class="date-filter-input"
+          placeholder="Escolha uma data"
+        />
+      </div>
+      <div class="coluna-container" style="margin-top: 30px">
         <div
           v-for="(coluna, colunaIndex) of listaMesas"
           class="coluna"
@@ -47,7 +79,7 @@
               <div style="display: flex; flex-direction: column">
                 <div v-if="!mesa.objetoAuxiliar">
                   <cadeira
-                    @click="modalAbertaReservarSala = true"
+                    @click="selecionarMesa(mesa)"
                     :ocupado="mesa.ocupado"
                     v-if="
                       mesaIndex == 0 ||
@@ -115,22 +147,43 @@
 
   <reservar-sala-modal
     :modalAberta="modalAbertaReservarSala"
-    @modalAberta="modalAbertaReservarSala = $event"
+    :tableRoomId="tableRoom?.id"
+    :dataFiltrada="dataFiltrada"
+    @modalAberta="
+      modalAbertaReservarSala = $event;
+      if (!$event) getTableRooms();
+    "
   ></reservar-sala-modal>
+
+  <convidar-participante-modal
+    :modalAberta="modalAbertaConvidarParcipante"
+    @modalAberta="
+      modalAbertaConvidarParcipante = $event;
+      participanteSelecionado = null;
+    "
+  ></convidar-participante-modal>
 </template>
 
 <script>
-import { Component, Vue } from "vue-facing-decorator";
+import { Component, Vue, Watch } from "vue-facing-decorator";
 import Cadeira from "@/components/Cadeira/Cadeira.vue";
 import ReservarSalaModal from "@/views/SalaView/modal/ReservarSalaModal.vue";
 import TableRoomService from "@/services/TableRoomService.js";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
+import ConvidarParticipanteModal from "@/views/SalaView/modal/ConvidarParticipanteModal.vue";
 
 @Component({
-  components: { Cadeira, ReservarSalaModal, ButtonLabel },
+  components: {
+    Cadeira,
+    ReservarSalaModal,
+    ButtonLabel,
+    ConvidarParticipanteModal,
+  },
 })
 export default class SalaView extends Vue {
   modalAbertaReservarSala = false;
+  modalAbertaConvidarParcipante = false;
+
   mesaHover = null;
 
   usuario;
@@ -139,16 +192,35 @@ export default class SalaView extends Vue {
 
   listaMesas = [];
 
+  dataFiltrada = new Date().toISOString().substr(0, 10);
+
   mounted() {
     this.usuario = JSON.parse(localStorage.getItem("usuario"));
 
     this.getTableRooms();
   }
 
+  @Watch("dataFiltrada")
+  onDateChange() {
+    this.$nextTick(() => {
+      this.getTableRooms();
+    });
+  }
+
+  async abrirModalConvidarParticipar() {
+    this.modalAbertaConvidarParcipante = true;
+  }
+
   async getTableRooms() {
     console.log("gettt");
+    const roomId = this.$route.params.id;
+
     try {
-      const response = await TableRoomService.getTableRoom();
+      const response = await TableRoomService.getAllTablesRoomByDateAndUser(
+        this.usuario.id,
+        new Date(this.dataFiltrada).toISOString(),
+        Number(roomId)
+      );
       console.log("getTableRooms response", response);
 
       // Verificar se a resposta está vazia ou se não contém dados
@@ -2253,10 +2325,22 @@ export default class SalaView extends Vue {
       ];
 
       // Verificar a variável listaMesas
-      console.log("listaMesas:", this.listaMesas);
+      this.listaMesas = [[response[0]], [response[1]]];
+
+      console.log("listaMesas", this.listaMesas);
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async selecionarMesa(mesa) {
+    this.tableRoom = mesa;
+
+    this.$nextTick(() => {
+      console.log("this.tableRoom", this.tableRoom);
+
+      this.modalAbertaReservarSala = true;
+    });
   }
 
   async adicionarMesa(mesa) {
@@ -2281,6 +2365,10 @@ export default class SalaView extends Vue {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  voltar() {
+    this.$router.push("/home");
   }
 }
 </script>
@@ -2366,5 +2454,52 @@ export default class SalaView extends Vue {
   border-radius: 4px;
   padding: 10px;
   border: 1px solid #f4a266;
+}
+
+label {
+  color: #555555;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.date-filter-container {
+  margin-left: 20px;
+}
+
+.date-filter-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+  color: #555555;
+}
+
+.date-filter-input {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #f4a266;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.date-filter-input::placeholder {
+  color: #999;
+}
+
+.date-filter-input:focus {
+  outline: none;
+}
+
+.select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #f4a266;
+  border-radius: 4px;
+  width: 200px;
+  background: white;
+  color: #555555;
+}
+
+.select:focus {
+  outline: none;
 }
 </style>

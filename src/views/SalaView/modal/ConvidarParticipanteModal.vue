@@ -6,10 +6,19 @@
     @confirmar="confirmar()"
   >
     <div class="container-modal">
-      <span class="span-14"
-        >Você está prestes a reservar uma mesa para o dia selecionado. Tem
-        certeza que deseja continuar com a reserva?</span
-      >
+      <span class="span-14">
+        Ao convidar um participante, ele poderá entrar na sala.
+      </span>
+
+      <select class="select" v-model="participanteSelecionado">
+        <option
+          v-for="(option, index) in listaUsuarios"
+          :value="option"
+          :key="index"
+        >
+          {{ option.name }}
+        </option>
+      </select>
     </div>
   </modal>
 </template>
@@ -19,12 +28,13 @@ import { Component, Vue, Prop, Watch } from "vue-facing-decorator";
 import ButtonLabel from "@/components/ButtonLabel/ButtonLabel.vue";
 import Modal from "@/components/Modal/Modal.vue";
 import InputText from "@/components/InputText/InputText.vue";
-import UserReserveTableRoomService from "@/services/UserReserveTableRoomService";
+import RoomService from "@/services/RoomService.js";
+import UserService from "@/services/UserService.js";
 
 @Component({
   components: { ButtonLabel, Modal, InputText },
 })
-export default class ReservarSalaModal extends Vue {
+export default class ConvidarParticipanteModal extends Vue {
   @Prop()
   modalAberta = false;
 
@@ -35,6 +45,9 @@ export default class ReservarSalaModal extends Vue {
   dataFiltrada;
 
   reserva = {};
+
+  participanteSelecionado = null;
+  listaUsuarios = [];
 
   get tituloModal() {
     return "Reservar Sala";
@@ -52,6 +65,13 @@ export default class ReservarSalaModal extends Vue {
       tableRoomId: this.tableRoomId,
       date: this.dataFiltrada,
     };
+
+    this.getUsers();
+  }
+
+  async getUsers() {
+    const response = await UserService.getUsers();
+    this.listaUsuarios = response;
   }
 
   fecharModal() {
@@ -59,13 +79,18 @@ export default class ReservarSalaModal extends Vue {
   }
 
   async confirmar() {
+    const roomId = this.$route.params.id;
     try {
-      await UserReserveTableRoomService.createUserReserveTableRoomService(
-        this.reserva
-      );
+      if (this.participanteSelecionado?.id) {
+        await RoomService.createUserRoom({
+          roomId: Number(roomId),
+          userId: this.participanteSelecionado?.id,
+        });
+      }
+
       this.$emit("modalAberta", false);
     } catch (error) {
-      console.error(error);
+      alert(error?.response?.data?.message);
     }
   }
 }
