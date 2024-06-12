@@ -9,6 +9,11 @@
             :label="'Criar Sala'"
             @click="onCriarSala()"
           ></button-label>
+          <button-label
+            class="ml-4"
+            :label="'Relatório'"
+            @click="irParaRelatorio()"
+          ></button-label>
         </div>
 
         <div class="tag-usuario centralizar">
@@ -108,6 +113,10 @@ export default class HomeView extends Vue {
 
   entrarSala(salaId) {
     this.$router.push("/sala/" + salaId);
+  }
+
+  irParaRelatorio() {
+    this.$router.push("/relatorio");
   }
 }
 </script>
