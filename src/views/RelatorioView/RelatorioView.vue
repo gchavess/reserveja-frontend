@@ -21,49 +21,57 @@
       </div>
     </div>
 
-    <div class="search-container">
-      <select class="select input" v-model="searchUsuario" style="width: 200px">
-        <option
-          v-for="(option, index) in listaUsuarios"
-          :value="option"
-          :key="index"
-        >
-          {{ option.name }}
-        </option>
-      </select>
-      <input-text
-        v-model="searchData"
-        type="date"
-        class="mt-4 input-relatorio"
-        :placeholder="'Pesquisar por data'"
-      ></input-text>
-      <button-label
-        class="ml-4 pesquisar"
-        :label="'Limpar Filtros'"
-        @click="
-          searchUsuario = '';
-          searchData = '';
-        "
-      ></button-label>
-    </div>
+    <div style="margin-top: 100px">
+      <span class="title-secondary" style="margin-left: 16px">Relatório</span>
 
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Sala</th>
-            <th>Data da Reserva</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in filteredItems" :key="index">
-            <td>{{ item?.User?.name }}</td>
-            <td>{{ item?.Room?.name }}</td>
-            <td>{{ formatarData(item?.date) }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="search-container">
+        <select
+          class="select input"
+          v-model="searchUsuario"
+          style="width: 200px"
+        >
+          <option
+            v-for="(option, index) in listaUsuarios"
+            :value="option"
+            :key="index"
+          >
+            {{ option.name }}
+          </option>
+        </select>
+        <input-text
+          v-model="searchData"
+          type="date"
+          class="mt-4 input-relatorio"
+          :placeholder="'Pesquisar por data'"
+        ></input-text>
+        <button-label
+          class="ml-4 pesquisar"
+          :label="'Limpar Filtros'"
+          @click="
+            searchUsuario = '';
+            searchData = '';
+          "
+        ></button-label>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Sala</th>
+              <th>Data da Reserva</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in filteredItems" :key="index">
+              <td>{{ item?.User?.name }}</td>
+              <td>{{ item?.Room?.name }}</td>
+              <td>{{ formatarData(item?.date) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -182,7 +190,6 @@ export default class HomeView extends Vue {
 }
 
 .search-container {
-  margin-top: 70px;
   display: flex;
   gap: 6px;
   padding: 14px 20px;
