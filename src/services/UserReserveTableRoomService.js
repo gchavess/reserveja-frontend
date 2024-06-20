@@ -10,6 +10,10 @@ const UserReserveTableRoomService = {
     );
     return response.data;
   },
+  getRelatorio: async () => {
+    const response = await axios.get(`${API_URL}/userReserveTableRoom`);
+    return response.data;
+  },
 };
 
 export default UserReserveTableRoomService;

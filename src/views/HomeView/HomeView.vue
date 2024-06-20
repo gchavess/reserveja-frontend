@@ -4,46 +4,58 @@
       <div class="centralizar">
         <div class="centralizar">
           <span class="title pl-4">Reserve Já</span>
-          <button-label
-            class="ml-4"
-            :label="'Criar Sala'"
-            @click="onCriarSala()"
-          ></button-label>
-          <button-label
-            class="ml-4"
-            :label="'Relatório'"
-            @click="irParaRelatorio()"
-          ></button-label>
-        </div>
+          <div style="position: absolute; right: 0px; display: flex; gap: 20px">
+            <button-label
+              :label="'Criar Sala'"
+              @click="onCriarSala()"
+            ></button-label>
+            <button-label
+              :label="'Relatório'"
+              @click="irParaRelatorio()"
+            ></button-label>
 
-        <div class="tag-usuario centralizar">
-          <span class="span-24">{{ usuario?.name }}</span>
-          <i
-            class="fa-solid fa-ellipsis-vertical pl-4"
-            style="color: #555555"
-          ></i>
+            <div class="tag-usuario centralizar">
+              <span class="span-24">{{ usuario?.name }}</span>
+              <i
+                class="fa-solid fa-ellipsis-vertical pl-4"
+                style="color: #555555"
+              ></i>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="container-cards-sala pl-4">
-      <div
-        v-for="sala of listaSalas"
-        :key="sala.Rooms.id"
-        class="card-sala"
-        @click="entrarSala(sala.Rooms.id)"
+    <div style="margin-top: 100px; display: flex; flex-direction: column">
+      <span class="title-secondary" style="margin-left: 12px"
+        >Minhas salas</span
       >
-        <div class="content-card-sala">
-          <div style="display: flex" class="centralizar">
-            <span class="span-24" style="padding-top: 10px">{{
-              sala.Rooms?.name
-            }}</span>
+
+      <div class="container-cards-sala pl-4 pt-4">
+        <div
+          v-for="sala of listaSalas"
+          :key="sala.Rooms.id"
+          class="card-sala"
+          @click="entrarSala(sala.Rooms.id)"
+        >
+          <i
+            class="fa-solid fa-trash icone-excluir-sala"
+            @click.stop="onExcluirSala(sala)"
+          ></i>
+
+          <div
+            style="
+              display: flex;
+              height: 100%;
+              width: 100%;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <span class="span-24" style="padding-top: 10px">
+              {{ sala.Rooms?.name }}
+            </span>
           </div>
         </div>
-        <i
-          class="fa-solid fa-trash icone-excluir-sala"
-          @click.stop="onExcluirSala(sala)"
-        ></i>
       </div>
     </div>
   </div>
@@ -53,7 +65,7 @@
     :acaoBotao="acaoBotaoSalas"
     :salaProp="salaSelecionada"
     @recarregar="getRooms"
-    @modalAberta="(modalCriarSalaAberta = $event), console.log('modalAberta')"
+    @modalAberta="modalCriarSalaAberta = $event"
   ></criar-sala-modal>
 </template>
 
@@ -87,7 +99,6 @@ export default class HomeView extends Vue {
   async getRooms() {
     try {
       const response = await RoomService.getRooms(this.usuario.id);
-      console.log("reponse", response);
       this.listaSalas = response;
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -142,9 +153,6 @@ export default class HomeView extends Vue {
 }
 
 .tag-usuario {
-  position: absolute;
-  right: 0px;
-  display: flex;
   align-items: center;
   margin-right: 20px;
   border-radius: 4px;
@@ -156,7 +164,6 @@ export default class HomeView extends Vue {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 100px;
 }
 
 .card-sala {
@@ -181,7 +188,7 @@ export default class HomeView extends Vue {
 .icone-excluir-sala {
   position: absolute;
   color: #555555;
-  margin-top: -45px;
-  margin-left: 162px;
+  margin-top: 10px;
+  margin-left: 170px;
 }
 </style>

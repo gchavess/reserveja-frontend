@@ -37,7 +37,7 @@ export default class ReservarSalaModal extends Vue {
   reserva = {};
 
   get tituloModal() {
-    return "Reservar Sala";
+    return "Reservar Mesa";
   }
 
   @Watch("modalAberta", { immediate: true })

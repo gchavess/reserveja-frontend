@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" :key="tableRoom?.id">
     <div class="toolbar">
       <!--
       <button-label
@@ -10,13 +10,20 @@
         @click="modoAdministrador = !modoAdministrador"
       ></button-label>
       -->
+
       <i
         class="fa fa-chevron-left"
         style="margin-left: 20px; color: #555555"
         @click="voltar()"
       ></i>
 
-      <div style="margin-left: 30px">
+      <div class="centralizar">
+        <div class="centralizar">
+          <span class="title pl-4">Reserve Já</span>
+        </div>
+      </div>
+
+      <div style="position: absolute; right: 0px; display: flex; gap: 20px">
         <button-label
           :label="'Convidar Participante'"
           :widthCemPorCentro="false"
@@ -24,14 +31,100 @@
           class="ml-4"
           @click="abrirModalConvidarParticipar()"
         ></button-label>
+        <div class="tag-usuario centralizar">
+          <span class="span-24">{{ usuario?.name }}</span>
+          <i
+            class="fa-solid fa-ellipsis-vertical pl-4"
+            style="color: #555555"
+          ></i>
+        </div>
       </div>
+    </div>
 
-      <div class="tag-usuario centralizar">
-        <span class="span-24">{{ usuario?.name }}</span>
-        <i
-          class="fa-solid fa-ellipsis-vertical pl-4"
-          style="color: #555555"
-        ></i>
+    <div
+      style="
+        width: 300px;
+        height: 180px;
+        background-color: white;
+        right: 100px;
+        position: absolute;
+        bottom: 0;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        z-index: 3;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+      "
+      :class="{ 'painel-table-user': tableRoom?.user }"
+      :style="tableRoom ? ';' : 'display: none;'"
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          flex-direction: column;
+        "
+        :style="tableRoom?.user ? 'padding-top: 80px;' : ''"
+      >
+        <div
+          v-if="!tableRoom?.user"
+          style="
+            display: flex;
+            flex-direction: column;
+            margin-top: 40px;
+            gap: 20px;
+          "
+        >
+          <span class="title-secondary">Reservar Mesa</span>
+
+          <button-label
+            :label="'Reservar'"
+            :widthCemPorCentro="false"
+            :cor="'primaria'"
+            @click="modalAbertaReservarSala = true"
+          ></button-label>
+        </div>
+
+        <div v-if="tableRoom?.user">
+          <div
+            style="
+              width: 100px;
+              height: 100px;
+              background-color: #f0f0f0;
+              border-radius: 50%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              position: absolute;
+              margin-top: -110px;
+              border: 4px solid #555555;
+              margin-left: 66px;
+            "
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="64"
+              height="64"
+              fill="#555555"
+              class="bi bi-person"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8 9a5.5 5.5 0 0 0-4.473 2.406C3.211 12.555 4.725 13 8 13s4.789-.445 4.473-1.594A5.5 5.5 0 0 0 8 9z"
+              />
+            </svg>
+          </div>
+          <div style="margin-top: 30px">
+            <span class="title-secondary">Cadeira Reservada</span>
+            <div
+              style="display: flex; flex-direction: column; margin-top: 30px"
+            >
+              <span class="span-20">Reservado por: </span
+              ><span class="span-20">{{ tableRoom?.user?.name }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -51,7 +144,7 @@
           placeholder="Escolha uma data"
         />
       </div>
-      <div class="coluna-container" style="margin-top: 30px">
+      <div class="coluna-container" style="padding-top: 90px">
         <div
           v-for="(coluna, colunaIndex) of listaMesas"
           class="coluna"
@@ -77,13 +170,14 @@
               ></cadeira>
               -->
               <div style="display: flex; flex-direction: column">
-                <div v-if="!mesa.objetoAuxiliar">
+                <div v-if="!mesa?.objetoAuxiliar">
                   <cadeira
-                    @click="selecionarMesa(mesa)"
+                    @click="tableRoom = mesa"
                     :ocupado="mesa.ocupado"
                     v-if="
-                      mesaIndex == 0 ||
-                      listaMesas[colunaIndex][mesaIndex - 1]?.objetoAuxiliar
+                      !mesa.objetoAuxiliar &&
+                      (mesaIndex == 0 ||
+                        listaMesas[colunaIndex][mesaIndex - 1]?.objetoAuxiliar)
                     "
                   ></cadeira>
                   <div style="display: flex; align-items: center">
@@ -127,15 +221,18 @@
                   </div>
                 </div>
                 <div
-                  v-if="mesa.objetoAuxiliar"
+                  v-if="mesa?.objetoAuxiliar"
                   style="height: 80px; width: 80px"
                 ></div>
 
                 <cadeira
                   :lado="'cima'"
                   :ocupado="mesa.ocupado"
-                  v-if="listaMesas[colunaIndex][mesaIndex + 1]?.objetoAuxiliar"
-                  @click="modalAbertaReservarSala = true"
+                  v-if="
+                    listaMesas[colunaIndex][mesaIndex + 1]?.objetoAuxiliar &&
+                    !mesa.objetoAuxiliar
+                  "
+                  @click="tableRoom = mesa"
                 ></cadeira>
               </div>
             </div>
@@ -151,7 +248,10 @@
     :dataFiltrada="dataFiltrada"
     @modalAberta="
       modalAbertaReservarSala = $event;
-      if (!$event) getTableRooms();
+      if (!$event) {
+        getTableRooms();
+        tableRoom = null;
+      }
     "
   ></reservar-sala-modal>
 
@@ -212,7 +312,6 @@ export default class SalaView extends Vue {
   }
 
   async getTableRooms() {
-    console.log("gettt");
     const roomId = this.$route.params.id;
 
     try {
@@ -221,11 +320,9 @@ export default class SalaView extends Vue {
         new Date(this.dataFiltrada).toISOString(),
         Number(roomId)
       );
-      console.log("getTableRooms response", response);
 
       // Verificar se a resposta está vazia ou se não contém dados
       if (!response || response.length === 0) {
-        console.log("Resposta vazia ou sem dados.");
         return;
       }
 
@@ -249,2098 +346,26 @@ export default class SalaView extends Vue {
       this.listaMesas = Object.values(objetosPorLinha);
       */
 
-      this.listaMesas = [
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-        [
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-          {
-            id: 1,
-            column: 1,
-            line: 1,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 1,
-            column: 2,
-            line: 2,
-            objetoAuxiliar: false,
-            createdAt: "2024-05-22T23:04:09.000Z",
-            updatedAt: "2024-05-22T23:04:09.000Z",
-          },
-          {
-            id: 5,
-            column: 1,
-            line: 2,
-            objetoAuxiliar: true,
-            createdAt: "2024-05-22T23:04:56.000Z",
-            updatedAt: "2024-05-22T23:04:56.000Z",
-          },
-        ],
-      ];
+      const mesas = response;
 
-      // Verificar a variável listaMesas
-      this.listaMesas = [[response[0]], [response[1]]];
+      this.listaMesas = [];
 
-      console.log("listaMesas", this.listaMesas);
+      for (const mesa of mesas) {
+        const coluna = mesa.column;
+
+        // Inicializa o array se ele ainda não existe
+        if (!this.listaMesas[coluna]) {
+          this.listaMesas[coluna] = [];
+        }
+
+        // Adiciona a mesa ao array correspondente à linha
+        this.listaMesas[coluna].push(mesa);
+      }
+
+      console.log("this.listaMesas", this.listaMesas);
     } catch (error) {
       console.error(error);
     }
-  }
-
-  async selecionarMesa(mesa) {
-    this.tableRoom = mesa;
-
-    this.$nextTick(() => {
-      console.log("this.tableRoom", this.tableRoom);
-
-      this.modalAbertaReservarSala = true;
-    });
   }
 
   async adicionarMesa(mesa) {
@@ -2358,7 +383,6 @@ export default class SalaView extends Vue {
   }
 
   async removerMesa(mesa) {
-    console.log("removerMesa");
     try {
       await TableRoomService.deleteTableRoom(mesa.id);
       this.getTableRooms();
@@ -2390,8 +414,8 @@ export default class SalaView extends Vue {
 }
 
 .content-salas {
-  margin-top: 60px;
-  overflow: auto;
+  margin-top: 70px;
+  overflow: none;
   height: 100%;
 }
 
@@ -2446,8 +470,6 @@ export default class SalaView extends Vue {
 }
 
 .tag-usuario {
-  position: absolute;
-  right: 0px;
   display: flex;
   align-items: center;
   margin-right: 20px;
@@ -2501,5 +523,9 @@ label {
 
 .select:focus {
   outline: none;
+}
+
+.painel-table-user {
+  height: 400px !important;
 }
 </style>

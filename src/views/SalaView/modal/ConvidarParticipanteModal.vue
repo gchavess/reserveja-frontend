@@ -50,7 +50,7 @@ export default class ConvidarParticipanteModal extends Vue {
   listaUsuarios = [];
 
   get tituloModal() {
-    return "Reservar Sala";
+    return "Convidar Participante";
   }
 
   @Watch("modalAberta", { immediate: true })
